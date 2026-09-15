@@ -63,11 +63,11 @@ Slurm 是 HPC 中常见的任务调度系统。
 
 Job Scheduling + Resource Allocation + Job State Management
 
-## 4. What is a Job?
+## 5. What is a Job?
 
 Job 是用户提交给 Scheduler 的一次计算任务
 
-## 5. sbatch vs squeue vs sacct
+## 6. sbatch vs squeue vs sacct
 
 sbatch用于提交任务和需求提出
 
@@ -75,9 +75,9 @@ squeue是用于查看job现在的任务状态
 
 sacct是用于查看job的历史和资源记录,即使 Job 已经结束，也可以通过 `sacct` 查看
 
-## 6. Job Lifecycle
+## 7. Job Lifecycle
 
-准备代码---写sbatch脚本---sbatch提交--->
+准备代码和数据---写sbatch脚本---sbatch提交--->
                  ┌→ COMPLETED
 PENDING → RUNNING
                  ├→ FAILED
@@ -85,8 +85,63 @@ PENDING → RUNNING
                  ├→ TIMEOUT
                  └→ CANCELLED
 
-## 7.Why does ResearchOps need multiple evidence sources?
+## 8.Why does ResearchOps need multiple evidence sources?
 
 一个证据不足以证明结论的可靠性，多重证据能从多个角度验证，得出准确的错误信息和出错原因
 
 单一现象可能对应多个原因，所以要综合 Scheduler、日志、资源使用、脚本和环境等证据才能做更可靠的 Root Cause Diagnosis。
+
+## 9. 为什么不能只根据 stderr 判断故障？
+
+单独的一条错误信息可能存在多种解释。
+
+例如：
+
+```text
+Killed
+```
+
+并不能直接证明一定发生了内存溢出。
+
+应该进一步结合：
+
+```text
+Scheduler State
+Resource Usage
+stderr
+Submit Script
+```
+
+例如：
+
+```text
+State = OUT_OF_MEMORY
+
+RequestedMem = 32 GB
+
+MaxRSS = 31.9 GB
+```
+
+结合这些信息以后，才能更加可靠地判断：
+
+```text
+CPU_OUT_OF_MEMORY
+```
+
+因此：
+
+```text
+一个 Evidence
+≠
+Root Cause
+```
+
+更合理的是：
+
+```text
+Multiple Evidence
+↓
+Root Cause Diagnosis
+```
+
+这也是 ResearchOps 需要主动获取多个 Evidence Source 的原因。
