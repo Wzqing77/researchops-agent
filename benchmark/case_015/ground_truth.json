@@ -1,0 +1,18 @@
+{
+  "case_id": "case_015",
+  "fault_type": "PENDING_RESOURCES",
+  "root_cause": "The job is waiting because the requested GPU resources are currently unavailable.",
+  "difficulty": "easy",
+  "required_evidence": [
+    "scheduler_state",
+    "submit_script"
+  ],
+  "minimal_evidence": [
+    "scheduler_state",
+    "submit_script"
+  ],
+  "expected_tools": [
+    "get_job_accounting",
+    "read_submit_script"
+  ]
+}

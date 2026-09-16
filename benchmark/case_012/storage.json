@@ -1,0 +1,8 @@
+{
+  "filesystem": "/home",
+  "disk_usage_percent": 72,
+  "free_space_gb": 640,
+  "quota_limit_gb": 100,
+  "user_usage_gb": 100,
+  "quota_exceeded": true
+}

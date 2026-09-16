@@ -1,0 +1,18 @@
+{
+  "case_id": "case_016",
+  "fault_type": "PENDING_RESOURCES",
+  "root_cause": "No currently available node satisfies the requested high-memory job configuration.",
+  "difficulty": "medium",
+  "required_evidence": [
+    "scheduler_state",
+    "submit_script"
+  ],
+  "minimal_evidence": [
+    "scheduler_state",
+    "submit_script"
+  ],
+  "expected_tools": [
+    "get_job_accounting",
+    "read_submit_script"
+  ]
+}

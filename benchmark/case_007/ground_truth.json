@@ -1,0 +1,18 @@
+{
+  "case_id": "case_007",
+  "fault_type": "TIMEOUT",
+  "root_cause": "The job exceeded the requested Slurm walltime.",
+  "difficulty": "easy",
+  "required_evidence": [
+    "scheduler_state",
+    "submit_script"
+  ],
+  "minimal_evidence": [
+    "scheduler_state",
+    "submit_script"
+  ],
+  "expected_tools": [
+    "get_job_accounting",
+    "read_submit_script"
+  ]
+}

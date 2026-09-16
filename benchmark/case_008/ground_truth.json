@@ -1,0 +1,18 @@
+{
+  "case_id": "case_008",
+  "fault_type": "MISSING_DEPENDENCY",
+  "root_cause": "The runtime environment is missing the required cuDNN shared library.",
+  "difficulty": "ambiguous",
+  "required_evidence": [
+    "stderr",
+    "environment"
+  ],
+  "minimal_evidence": [
+    "stderr",
+    "environment"
+  ],
+  "expected_tools": [
+    "read_stderr",
+    "get_environment"
+  ]
+}

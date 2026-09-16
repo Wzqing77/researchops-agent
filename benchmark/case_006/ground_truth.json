@@ -1,0 +1,18 @@
+{
+  "case_id": "case_006",
+  "fault_type": "CUDA_OUT_OF_MEMORY",
+  "root_cause": "GPU memory was exhausted during model training.",
+  "difficulty": "medium",
+  "required_evidence": [
+    "stderr",
+    "resource_usage"
+  ],
+  "minimal_evidence": [
+    "stderr",
+    "resource_usage"
+  ],
+  "expected_tools": [
+    "read_stderr",
+    "get_resource_usage"
+  ]
+}

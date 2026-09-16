@@ -1,0 +1,23 @@
+{
+  "case_id": "case_010",
+  "fault_type": "WRONG_FILE_PATH",
+  "root_cause": "A relative input path was resolved from the wrong working directory.",
+  "difficulty": "ambiguous",
+  "required_evidence": [
+    "stderr",
+    "submit_script",
+    "environment",
+    "storage_info"
+  ],
+  "minimal_evidence": [
+    "stderr",
+    "environment",
+    "storage_info"
+  ],
+  "expected_tools": [
+    "read_stderr",
+    "read_submit_script",
+    "get_environment",
+    "check_storage"
+  ]
+}

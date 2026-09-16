@@ -1,0 +1,5 @@
+{
+  "requested_memory_gb": 32,
+  "max_rss_gb": 0.5,
+  "cpu_efficiency": 2.2
+}

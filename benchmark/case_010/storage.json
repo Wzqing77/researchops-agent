@@ -1,0 +1,8 @@
+{
+  "disk_usage_percent": 38,
+  "quota_exceeded": false,
+  "requested_path": "/home/user/project/scripts/data/train.csv",
+  "requested_path_exists": false,
+  "actual_path": "/home/user/project/data/train.csv",
+  "actual_path_exists": true
+}

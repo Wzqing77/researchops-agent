@@ -1,0 +1,20 @@
+{
+  "case_id": "case_014",
+  "fault_type": "PERMISSION_DENIED",
+  "root_cause": "The submitted shell script is not executable because the execute permission is missing.",
+  "difficulty": "ambiguous",
+  "required_evidence": [
+    "stderr",
+    "submit_script",
+    "storage_info"
+  ],
+  "minimal_evidence": [
+    "stderr",
+    "storage_info"
+  ],
+  "expected_tools": [
+    "read_stderr",
+    "read_submit_script",
+    "check_storage"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "python_version": "3.11",
+  "conda_environment": "gwas",
+  "packages": [
+    "numpy",
+    "pandas",
+    "scipy"
+  ]
+}

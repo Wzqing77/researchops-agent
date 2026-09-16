@@ -1,0 +1,18 @@
+{
+  "case_id": "case_012",
+  "fault_type": "DISK_FULL",
+  "root_cause": "The user exceeded their storage quota even though the filesystem still has free space.",
+  "difficulty": "medium",
+  "required_evidence": [
+    "stderr",
+    "storage_info"
+  ],
+  "minimal_evidence": [
+    "stderr",
+    "storage_info"
+  ],
+  "expected_tools": [
+    "read_stderr",
+    "check_storage"
+  ]
+}

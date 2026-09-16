@@ -1,0 +1,10 @@
+{
+  "path": "/shared/ref/genome.fa",
+  "path_exists": true,
+  "owner": "admin",
+  "group": "bioinfo",
+  "mode": "0640",
+  "user_groups": [
+    "users"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "case_id": "case_005",
+  "fault_type": "CPU_OUT_OF_MEMORY",
+  "root_cause": "The job exhausted its requested system memory.",
+  "difficulty": "medium",
+  "required_evidence": [
+    "scheduler_state",
+    "resource_usage"
+  ],
+  "minimal_evidence": [
+    "scheduler_state",
+    "resource_usage"
+  ],
+  "expected_tools": [
+    "get_job_accounting",
+    "get_resource_usage"
+  ]
+}

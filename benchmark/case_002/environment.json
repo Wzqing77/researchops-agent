@@ -1,0 +1,9 @@
+{
+  "python_version": "3.11",
+  "conda_environment": "torch",
+  "packages": [
+    "torch",
+    "numpy"
+  ],
+  "cuda_version": "12.1"
+}

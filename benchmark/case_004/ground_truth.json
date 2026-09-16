@@ -1,0 +1,18 @@
+{
+  "case_id": "case_004",
+  "fault_type": "MISSING_DEPENDENCY",
+  "root_cause": "The Python environment does not contain the required torch package.",
+  "difficulty": "medium",
+  "required_evidence": [
+    "stderr",
+    "environment"
+  ],
+  "minimal_evidence": [
+    "stderr",
+    "environment"
+  ],
+  "expected_tools": [
+    "read_stderr",
+    "get_environment"
+  ]
+}

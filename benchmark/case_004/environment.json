@@ -1,0 +1,9 @@
+{
+  "python_version": "3.11",
+  "conda_environment": "analysis_env",
+  "packages": [
+    "numpy",
+    "pandas",
+    "scipy"
+  ]
+}

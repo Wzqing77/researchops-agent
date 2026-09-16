@@ -1,0 +1,15 @@
+{
+  "case_id": "case_002",
+  "fault_type": "CUDA_OUT_OF_MEMORY",
+  "root_cause": "The model exceeded available GPU memory.",
+  "difficulty": "easy",
+  "required_evidence": [
+    "stderr"
+  ],
+  "minimal_evidence": [
+    "stderr"
+  ],
+  "expected_tools": [
+    "read_stderr"
+  ]
+}

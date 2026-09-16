@@ -1,0 +1,10 @@
+{
+  "python_version": "3.11",
+  "conda_environment": "inference",
+  "packages": [
+    "torch",
+    "numpy"
+  ],
+  "cuda_version": "12.1",
+  "cudnn_available": false
+}
