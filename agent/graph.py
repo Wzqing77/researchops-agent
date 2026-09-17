@@ -24,12 +24,29 @@ from agent.prompts import (
     FINAL_DIAGNOSIS_PROMPT,
 )
 
+from langchain_core.messages import (
+    AIMessage,
+    HumanMessage,
+    SystemMessage,
+    ToolMessage,
+)
+
+from agent.schemas import (
+    DiagnosisResult,
+)
+
+from agent.evidence import (
+    build_evidence_store,
+    validate_evidence,
+)
 
 # ============================================================
 # Model
 # ============================================================
 
-def build_model():
+def build_model(
+    thinking: bool = True,
+):
 
     load_dotenv()
 
@@ -43,23 +60,53 @@ def build_model():
             "DEEPSEEK_API_KEY is missing."
         )
 
+
+    model_kwargs = {
+
+        "model":
+            os.getenv(
+                "DEEPSEEK_MODEL",
+                "deepseek-flash",
+            ),
+
+        "api_key":
+            api_key,
+
+        "base_url":
+            os.getenv(
+                "DEEPSEEK_BASE_URL",
+                "https://api.deepseek.com",
+            ),
+
+        "timeout":
+            60,
+
+        "extra_body": {
+
+            "thinking": {
+
+                "type": (
+                    "enabled"
+                    if thinking
+                    else "disabled"
+                )
+            }
+        },
+    }
+
+
+    # Thinking Mode 下 temperature
+    # 不起实际作用，所以只在非 Thinking
+    # Structured Output 模型中设置。
+    if not thinking:
+
+        model_kwargs[
+            "temperature"
+        ] = 0
+
+
     return ChatOpenAI(
-
-        model=os.getenv(
-            "DEEPSEEK_MODEL",
-            "deepseek-flash",
-        ),
-
-        api_key=api_key,
-
-        base_url=os.getenv(
-            "DEEPSEEK_BASE_URL",
-            "https://api.deepseek.com",
-        ),
-
-        temperature=0,
-
-        timeout=60,
+        **model_kwargs
     )
 
 
@@ -121,6 +168,131 @@ def _collect_tool_evidence(
     )
 
 # ============================================================
+# 格式化诊断
+# ============================================================
+
+
+def _render_diagnosis(
+    diagnosis,
+    validation,
+) -> str:
+
+    lines = []
+
+    lines.append(
+        "===== STRUCTURED DIAGNOSIS ====="
+    )
+
+    lines.append(
+        f"Fault Type: "
+        f"{diagnosis.fault_type}"
+    )
+
+    lines.append(
+        f"\nRoot Cause:\n"
+        f"{diagnosis.root_cause}"
+    )
+
+    lines.append(
+        "\nEvidence:"
+    )
+
+
+    for index, evidence in enumerate(
+        diagnosis.evidence,
+        start=1,
+    ):
+
+        field_text = (
+
+            evidence.field
+
+            if evidence.field
+
+            else "TEXT"
+        )
+
+
+        lines.append(
+
+            (
+                f"{index}. "
+                f"[{evidence.source}] "
+                f"{field_text} = "
+                f"{evidence.value}\n"
+                f"   Supports: "
+                f"{evidence.supports}"
+            )
+        )
+
+
+    lines.append(
+        "\nRecommendations:"
+    )
+
+
+    for recommendation in (
+        diagnosis.recommendations
+    ):
+
+        lines.append(
+            f"- {recommendation}"
+        )
+
+
+    lines.append(
+        (
+            "\nUncertainty:\n"
+            f"{diagnosis.uncertainty}"
+        )
+    )
+
+
+    lines.append(
+        "\n===== EVIDENCE VALIDATION ====="
+    )
+
+
+    lines.append(
+        (
+            f"Valid: "
+            f"{validation.valid}"
+        )
+    )
+
+
+    lines.append(
+        (
+            "Unsupported Evidence: "
+            f"{validation.unsupported_count}"
+        )
+    )
+
+
+    for check in validation.checks:
+
+        status = (
+            "PASS"
+            if check.grounded
+            else "FAIL"
+        )
+
+
+        lines.append(
+
+            (
+                f"[{status}] "
+                f"Evidence {check.index}: "
+                f"{check.reason}"
+            )
+        )
+
+
+    return "\n".join(
+        lines
+    )
+
+# ============================================================
 # Build Graph
 # ============================================================
 
@@ -129,16 +301,43 @@ def build_diagnostic_graph(
     retriever,
     model=None,
 ):
-
+    
     if model is None:
 
-        model = build_model()
+        model = build_model(
+            thinking=True
+        )
 
 
     # LLM 可以选择这些 Tools
     model_with_tools = (
         model.bind_tools(
             tools
+        )
+    )
+
+    # ============================================================
+    # Structured Diagnosis Model
+    #
+    # DeepSeek Thinking Mode 不支持
+    # function_calling structured output
+    # 所需要的 forced tool_choice。
+    #
+    # 因此最终结构化输出单独使用
+    # non-thinking model。
+    # ============================================================
+
+    structured_model = (
+
+        build_model(
+            thinking=False
+        )
+
+        .with_structured_output(
+
+            DiagnosisResult,
+
+            method="function_calling",
         )
     )
 
@@ -194,10 +393,21 @@ def build_diagnostic_graph(
         )
 
 
+        # 工程分层，initial_evidence给 LLM 看，initial_evidence_data给 Runtime Validator 用
+
         return {
 
             "initial_evidence":
-                initial_evidence
+                initial_evidence,
+
+            "initial_evidence_data": {
+
+                "get_job_status":
+                    status,
+
+                "read_stderr":
+                    stderr,
+            },
         }
 
 
@@ -344,51 +554,137 @@ def build_diagnostic_graph(
         state: DiagnosticState,
     ):
 
+        # ========================================================
+        # Collect Real Tool Evidence
+        # ========================================================
+
         tool_evidence = (
             _collect_tool_evidence(
                 state
             )
         )
 
+
+        # ========================================================
+        # Build Final Prompt
+        # ========================================================
+
         final_prompt = (
             FINAL_DIAGNOSIS_PROMPT.format(
-                job_id=state["job_id"],
 
-                initial_evidence=state.get(
-                    "initial_evidence",
-                    "",
-                ),
+                job_id=
+                    state["job_id"],
 
-                tool_evidence=tool_evidence,
+                initial_evidence=
+                    state.get(
+                        "initial_evidence",
+                        "",
+                    ),
 
-                knowledge_context=state.get(
-                    "knowledge_context",
-                    "",
-                ),
+                tool_evidence=
+                    tool_evidence,
+
+                knowledge_context=
+                    state.get(
+                        "knowledge_context",
+                        "",
+                    ),
             )
         )
 
 
-        response = model.invoke(
+        # ========================================================
+        # Structured LLM
+        # ========================================================
 
-            [
-                SystemMessage(
-                    content=
-                        final_prompt
-                ),
 
-                *state["messages"],
-            ]
+        diagnosis_result = (
+            structured_model.invoke(
+
+                [
+                    SystemMessage(
+                        content=
+                            final_prompt
+                    ),
+
+                    HumanMessage(
+                        content=(
+                            "请根据以上真实 Evidence "
+                            "生成最终结构化诊断。"
+                        )
+                    ),
+                ]
+            )
+        )
+
+
+        # ========================================================
+        # Runtime Evidence Store
+        # ========================================================
+
+        evidence_store = (
+            build_evidence_store(
+
+                initial_evidence_data=
+                    state.get(
+                        "initial_evidence_data",
+                        {},
+                    ),
+
+                messages=
+                    state["messages"],
+            )
+        )
+
+
+        # ========================================================
+        # Deterministic Evidence Validation
+        # ========================================================
+
+        validation_report = (
+            validate_evidence(
+
+                diagnosis=
+                    diagnosis_result,
+
+                evidence_store=
+                    evidence_store,
+            )
+        )
+
+
+        # ========================================================
+        # Human-readable Output
+        # ========================================================
+
+        final_text = (
+            _render_diagnosis(
+
+                diagnosis=
+                    diagnosis_result,
+
+                validation=
+                    validation_report,
+            )
         )
 
 
         return {
 
-            "messages": [
-                response
-            ]
-        }
+            "diagnosis":
+                diagnosis_result,
 
+            "evidence_validation":
+                validation_report,
+
+            "messages": [
+
+                AIMessage(
+                    content=
+                        final_text
+                )
+            ],
+        }
 
     # ========================================================
     # Graph

@@ -365,206 +365,222 @@ SIGKILL 还可能来自：
 
 
 FINAL_DIAGNOSIS_PROMPT = """
-你现在需要生成 ResearchOps 对当前 HPC Job 的最终诊断结果。
+你现在需要生成 ResearchOps 的最终结构化诊断。
 
 
-当前 Job ID：
+==============================
+当前 Job
+==============================
+
+Job ID：
 
 {job_id}
 
 
 ==============================
-一、初始证据
+Initial Evidence
 ==============================
 
 {initial_evidence}
 
 
 ==============================
-二、Diagnostic Tool 获取的真实 Evidence
+Diagnostic Tool Evidence
 ==============================
 
 {tool_evidence}
 
 
 ==============================
-三、RAG 检索得到的 HPC Knowledge
+RAG Knowledge
 ==============================
 
 {knowledge_context}
 
 
 ==============================
-四、最终诊断规则
+核心规则
 ==============================
 
-最终诊断必须严格基于真实 Evidence。
+必须严格区分：
 
-可以使用的证据来源只有：
+Evidence
+和
+Knowledge。
 
-1. Initial Evidence
-2. Diagnostic Tool Results
+Evidence：
 
-RAG Knowledge 只能用于：
+来自当前 Job 实际执行的：
 
-解释证据
+- Initial Inspection
+- Diagnostic Tool Result
 
-不能作为当前 Job 实际发生某件事情的证明。
+Knowledge：
 
+来自 RAG 文档。
 
-绝对禁止自行编造以下信息：
-
-- Scheduler State
-- ExitCode
-- Signal
-- RequestedMem
-- MaxRSS
-- GPU Memory
-- Walltime
-- Elapsed Time
-- Environment
-- Installed Packages
-- Storage Information
-- File Permission
-- Working Directory
-
-如果某项信息没有被 Tool 获取，
-就不要假设它存在。
+Knowledge 只能用于解释 Evidence，
+不能作为当前 Job 实际发生某件事的证明。
 
 
 ==============================
-五、输出格式
+Evidence 输出规则
 ==============================
 
-请严格按照下面格式输出：
+最终 diagnosis 中的每一条 Evidence
+都必须明确包含：
+
+source
+field
+value
+supports
 
 
-故障类型（Fault Type）：
-<填写标准故障类型>
+source：
+
+必须是真实执行过的 Evidence 来源，例如：
+
+get_job_status
+read_stderr
+get_resource_usage
+get_job_accounting
+read_submit_script
+get_environment
+check_storage
 
 
-根本原因（Root Cause）：
-<用简洁语言说明最可能的根本原因>
+如果 Evidence 来源是 JSON / dict：
 
-
-证据链（Evidence Chain）：
-
-- <证据 1>
-- <证据 2>
-- <证据 3>
-
-
-诊断解释（Reasoning）：
-
-<说明这些 Evidence 为什么支持当前 Root Cause。
-同时说明 RAG Knowledge 是如何帮助解释这些 Evidence 的。>
-
-
-建议措施（Recommendation）：
-
-- <建议 1>
-- <建议 2>
-
-
-不确定性（Uncertainty）：
-
-<说明当前诊断还存在哪些不确定性。
-如果证据已经非常明确，可以写“当前证据链较完整，主要诊断结论不存在明显歧义”。>
-
-
-==============================
-六、Fault Type 命名规范
-==============================
-
-Fault Type 优先从以下标准类型中选择：
-
-CPU_OUT_OF_MEMORY
-
-CUDA_OUT_OF_MEMORY
-
-TIMEOUT
-
-MISSING_DEPENDENCY
-
-WRONG_FILE_PATH
-
-DISK_FULL
-
-PERMISSION_DENIED
-
-PENDING_RESOURCES
-
-
-不要随意创造新的 Fault Type。
-
-
-==============================
-七、重要要求
-==============================
-
-不要因为看到某一个错误信息就直接下结论。
+field 必须填写真实字段名。
 
 例如：
 
-Killed
-
-不能单独推出：
-
-CPU_OUT_OF_MEMORY
+source = get_resource_usage
+field = max_rss_gb
+value = 31.9
 
 
-ExitCode = 0:9
+注意：
 
-不能单独推出：
+value 必须使用 Tool Result 中的原始值。
 
-CPU_OUT_OF_MEMORY
+不要自行增加单位。
 
+例如 Tool Result 是：
 
-FAILED
+"max_rss_gb": 31.9
 
-也不能单独说明具体故障类型。
+则：
 
+value = "31.9"
 
-最终结论应该来自：
+而不是：
 
-多条 Evidence
-+
-HPC Domain Knowledge
-+
-交叉验证
+value = "31.9 GB"
 
 
-Day 5 阶段暂时不要输出数值形式的 Confidence Score。
+如果 Evidence 来源是纯文本：
 
-Confidence、Risk Level、Structured Diagnosis
-将在后续阶段加入。
+field = null
+
+value 必须引用真实出现过的文本。
+
+例如：
+
+source = read_stderr
+field = null
+value = Killed
+
 
 ==============================
-证据边界规则
+证据边界
 ==============================
 
-最终回答必须区分：
+不得编造不存在的 Evidence。
 
-Observed Evidence
-和
-Inference。
+不得因为 Knowledge 中出现某个值，
+就把它当成当前 Job 的 Evidence。
 
-禁止以下类型无证据推断：
+判断 Evidence 来源的依据是：
 
-- 没有时间序列时，不得声称内存“持续增长”
-- 没有明确 Signal=9 时，不得把 Killed 写成 SIGKILL
-- 没有 oom-kill 日志时，不得声称一定由 Linux OOM Killer 终止
-- 没有 GPU Evidence 时，只能说“当前没有支持 CUDA OOM 的证据”，不能声称绝对不存在 GPU
-- 不得自行编造具体资源调整值
+数据从哪里获得
 
-例如不要无依据建议：
+而不是：
+
+数值是否与 Knowledge 相似。
+
+
+Diagnostic Tool Evidence
+优先于 RAG Knowledge。
+
+
+没有时间序列时：
+
+不能声称内存持续增长。
+
+
+只有：
+
+stderr = Killed
+
+不能声称：
+
+Signal = 9
+SIGKILL
+Linux OOM Killer
+
+
+没有 GPU Evidence 时：
+
+只能写：
+
+当前没有观察到支持 CUDA OOM 的证据。
+
+不能写：
+
+已经证明没有 GPU。
+
+
+==============================
+Fault Type
+==============================
+
+fault_type 必须从以下类型选择：
+
+CPU_OUT_OF_MEMORY
+CUDA_OUT_OF_MEMORY
+TIMEOUT
+MISSING_DEPENDENCY
+WRONG_FILE_PATH
+DISK_FULL
+PERMISSION_DENIED
+PENDING_RESOURCES
+
+
+==============================
+Recommendation
+==============================
+
+建议必须与已经观察到的 Evidence 相符。
+
+不要凭空给出：
 
 --mem=64G
 --time=04:00:00
 
-应该写：
+等未经 Evidence 支持的具体资源数值。
 
-“根据实际峰值和任务需求适当提高资源申请，并重新验证。”
+
+==============================
+目标
+==============================
+
+最终输出必须：
+
+结构化
+可验证
+基于真实 Evidence
+不编造事实
 
 Diagnostic Tool Evidence 的优先级高于 RAG Knowledge。
 
@@ -590,5 +606,51 @@ Y = Signal
 → Signal = 15
 
 不要自行转换为 128 + Signal 的 Shell Exit Status。
+
+最终 Evidence 列表只保留：
+
+对 Fault Type 或 Root Cause
+具有直接诊断价值的 Evidence。
+
+不要仅仅因为某个字段真实存在，
+就把它加入 Evidence Chain。
+
+例如：
+
+CPU Efficiency
+如果没有直接帮助区分当前故障类型，
+就不应作为 CPU OOM 的核心 Evidence。
+
+Evidence Chain 应优先满足：
+
+真实
++
+相关
++
+必要
++
+尽量精简
+
+对于纯文本 Evidence：
+
+优先引用能够直接支持诊断的
+最短原始文本片段。
+
+例如 stderr 为：
+
+Traceback ...
+File "train.py", line 3, in <module>
+    import torch
+ModuleNotFoundError: No module named 'torch'
+
+如果核心证据是模块缺失，
+优先使用：
+
+ModuleNotFoundError: No module named 'torch'
+
+而不是重复整个多行 Traceback。
+
+这样可以降低文本匹配歧义，
+同时保持 Evidence Chain 精简。
 
 """
