@@ -1,2 +1,6 @@
 python-dotenv
 langchain-core
+langchain-openai
+langgraph
+sentence-transformers
+numpy
