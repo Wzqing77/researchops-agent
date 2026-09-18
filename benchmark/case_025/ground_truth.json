@@ -1,0 +1,17 @@
+{
+  "case_id": "case_025",
+  "fault_type": "WRONG_FILE_PATH",
+  "root_cause": "Relative configuration path was invalid from the working directory.",
+  "difficulty": "ambiguous",
+  "required_evidence": [
+    "stderr",
+    "submit_script"
+  ],
+  "minimal_evidence": [
+    "stderr",
+    "submit_script"
+  ],
+  "expected_tools": [
+    "read_submit_script"
+  ]
+}

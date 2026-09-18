@@ -1,0 +1,6 @@
+{
+  "requested_memory_gb": 32,
+  "max_rss_gb": 9.4,
+  "gpu_memory_total_gb": 16,
+  "gpu_memory_peak_gb": 15.9
+}

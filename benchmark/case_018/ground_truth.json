@@ -1,0 +1,17 @@
+{
+  "case_id": "case_018",
+  "fault_type": "CPU_OUT_OF_MEMORY",
+  "root_cause": "Peak system RAM usage reached the allocated memory limit.",
+  "difficulty": "medium",
+  "required_evidence": [
+    "scheduler_state",
+    "resource_usage"
+  ],
+  "minimal_evidence": [
+    "scheduler_state",
+    "resource_usage"
+  ],
+  "expected_tools": [
+    "get_resource_usage"
+  ]
+}

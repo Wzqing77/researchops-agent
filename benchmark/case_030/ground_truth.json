@@ -1,0 +1,17 @@
+{
+  "case_id": "case_030",
+  "fault_type": "PENDING_RESOURCES",
+  "root_cause": "Job is waiting because requested resources are currently unavailable.",
+  "difficulty": "medium",
+  "required_evidence": [
+    "scheduler_state",
+    "submit_script"
+  ],
+  "minimal_evidence": [
+    "scheduler_state"
+  ],
+  "expected_tools": [
+    "get_job_accounting",
+    "read_submit_script"
+  ]
+}

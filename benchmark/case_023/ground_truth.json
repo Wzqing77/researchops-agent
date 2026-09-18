@@ -1,0 +1,16 @@
+{
+  "case_id": "case_023",
+  "fault_type": "MISSING_DEPENDENCY",
+  "root_cause": "Required cuDNN shared library was unavailable.",
+  "difficulty": "ambiguous",
+  "required_evidence": [
+    "stderr",
+    "environment"
+  ],
+  "minimal_evidence": [
+    "stderr"
+  ],
+  "expected_tools": [
+    "get_environment"
+  ]
+}

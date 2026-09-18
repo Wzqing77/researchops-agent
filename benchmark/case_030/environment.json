@@ -1,0 +1,8 @@
+{
+  "python_version": "3.11",
+  "conda_environment": "large_model_env",
+  "packages": [
+    "torch",
+    "transformers"
+  ]
+}

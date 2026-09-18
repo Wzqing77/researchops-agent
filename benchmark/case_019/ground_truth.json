@@ -1,0 +1,16 @@
+{
+  "case_id": "case_019",
+  "fault_type": "CUDA_OUT_OF_MEMORY",
+  "root_cause": "GPU VRAM was exhausted during model execution.",
+  "difficulty": "medium",
+  "required_evidence": [
+    "stderr",
+    "resource_usage"
+  ],
+  "minimal_evidence": [
+    "stderr"
+  ],
+  "expected_tools": [
+    "get_resource_usage"
+  ]
+}

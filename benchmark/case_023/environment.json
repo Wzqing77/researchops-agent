@@ -1,0 +1,11 @@
+{
+  "python_version": "3.11",
+  "conda_environment": "cnn_env",
+  "packages": [
+    "torch",
+    "numpy"
+  ],
+  "loaded_modules": [
+    "cuda/12.4"
+  ]
+}

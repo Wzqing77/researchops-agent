@@ -1,0 +1,16 @@
+{
+  "case_id": "case_028",
+  "fault_type": "DISK_FULL",
+  "root_cause": "Filesystem had no remaining capacity.",
+  "difficulty": "easy",
+  "required_evidence": [
+    "stderr",
+    "storage_info"
+  ],
+  "minimal_evidence": [
+    "stderr"
+  ],
+  "expected_tools": [
+    "check_storage"
+  ]
+}

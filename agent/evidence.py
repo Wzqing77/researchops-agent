@@ -427,6 +427,9 @@ def _text_matches(
         )
     )
 
+    # 空字符串不能作为有效 Evidence
+    if not expected_text:
+        return False
 
     return (
         expected_text

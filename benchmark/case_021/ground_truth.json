@@ -1,0 +1,18 @@
+{
+  "case_id": "case_021",
+  "fault_type": "TIMEOUT",
+  "root_cause": "Job reached the requested two-hour walltime.",
+  "difficulty": "ambiguous",
+  "required_evidence": [
+    "scheduler_state",
+    "submit_script"
+  ],
+  "minimal_evidence": [
+    "scheduler_state",
+    "submit_script"
+  ],
+  "expected_tools": [
+    "get_job_accounting",
+    "read_submit_script"
+  ]
+}

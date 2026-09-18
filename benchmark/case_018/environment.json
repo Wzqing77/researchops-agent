@@ -1,0 +1,8 @@
+{
+  "python_version": "3.11",
+  "conda_environment": "matrix_env",
+  "packages": [
+    "numpy",
+    "scipy"
+  ]
+}

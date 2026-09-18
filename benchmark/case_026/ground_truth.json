@@ -1,0 +1,16 @@
+{
+  "case_id": "case_026",
+  "fault_type": "WRONG_FILE_PATH",
+  "root_cause": "Configured reference file path did not exist.",
+  "difficulty": "easy",
+  "required_evidence": [
+    "stderr",
+    "submit_script"
+  ],
+  "minimal_evidence": [
+    "stderr"
+  ],
+  "expected_tools": [
+    "read_submit_script"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "case_id": "case_027",
+  "fault_type": "DISK_FULL",
+  "root_cause": "User storage quota was exhausted despite free filesystem capacity.",
+  "difficulty": "medium",
+  "required_evidence": [
+    "stderr",
+    "storage_info"
+  ],
+  "minimal_evidence": [
+    "stderr",
+    "storage_info"
+  ],
+  "expected_tools": [
+    "check_storage"
+  ]
+}

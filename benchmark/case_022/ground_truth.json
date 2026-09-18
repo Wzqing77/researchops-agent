@@ -1,0 +1,19 @@
+{
+  "case_id": "case_022",
+  "fault_type": "TIMEOUT",
+  "root_cause": "Job exceeded its configured walltime.",
+  "difficulty": "medium",
+  "required_evidence": [
+    "scheduler_state",
+    "stderr",
+    "submit_script"
+  ],
+  "minimal_evidence": [
+    "scheduler_state",
+    "stderr"
+  ],
+  "expected_tools": [
+    "get_job_accounting",
+    "read_submit_script"
+  ]
+}

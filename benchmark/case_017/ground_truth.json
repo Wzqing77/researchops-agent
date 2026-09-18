@@ -1,0 +1,17 @@
+{
+  "case_id": "case_017",
+  "fault_type": "CPU_OUT_OF_MEMORY",
+  "root_cause": "Job exceeded its allocated system memory.",
+  "difficulty": "ambiguous",
+  "required_evidence": [
+    "stderr",
+    "resource_usage"
+  ],
+  "minimal_evidence": [
+    "stderr",
+    "resource_usage"
+  ],
+  "expected_tools": [
+    "get_resource_usage"
+  ]
+}

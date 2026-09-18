@@ -653,4 +653,14 @@ ModuleNotFoundError: No module named 'torch'
 这样可以降低文本匹配歧义，
 同时保持 Evidence Chain 精简。
 
+如果某个 Tool Result 为空：
+
+不要把空字符串作为 Evidence。
+
+例如：
+
+read_stderr = ""
+
+不能作为支持任何 Fault Type 的有效 Evidence。
+
 """
