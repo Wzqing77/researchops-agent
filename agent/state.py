@@ -17,6 +17,10 @@ from agent.schemas import (
     EvidenceValidationReport,
 )
 
+from safety.schemas import (
+    ActionSafetyReview,
+)
+
 
 class DiagnosticState(
     MessagesState
@@ -48,4 +52,8 @@ class DiagnosticState(
 
     evidence_validation: NotRequired[
         EvidenceValidationReport
+    ]
+
+    safety_reviews:NotRequired[
+        list[ActionSafetyReview]
     ]

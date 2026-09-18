@@ -40,6 +40,10 @@ from agent.evidence import (
     validate_evidence,
 )
 
+from safety.review import (
+    review_actions,
+)
+
 # ============================================================
 # Model
 # ============================================================
@@ -175,6 +179,7 @@ def _collect_tool_evidence(
 def _render_diagnosis(
     diagnosis,
     validation,
+    safety_reviews,
 ) -> str:
 
     lines = []
@@ -287,6 +292,71 @@ def _render_diagnosis(
             )
         )
 
+    lines.append(
+        "\n===== RECOVERY ACTION SAFETY ====="
+    )
+
+
+    if not safety_reviews:
+
+        lines.append(
+            "No executable recovery actions proposed."
+        )
+
+
+    for index, review in enumerate(
+        safety_reviews,
+        start=1,
+    ):
+
+        lines.append(
+            (
+                f"\nAction {index}: "
+                f"{review.action.action}"
+            )
+        )
+
+        lines.append(
+            (
+                f"Target: "
+                f"{review.action.target}"
+            )
+        )
+
+        lines.append(
+            (
+                f"Risk: "
+                f"{review.risk_level.value}"
+            )
+        )
+
+        lines.append(
+            (
+                f"Decision: "
+                f"{review.decision.value}"
+            )
+        )
+
+        lines.append(
+            (
+                f"Approval Required: "
+                f"{review.approval_required}"
+            )
+        )
+
+        lines.append(
+            (
+                f"Executable Now: "
+                f"{review.executable}"
+            )
+        )
+
+        lines.append(
+            (
+                f"Blocked: "
+                f"{review.blocked}"
+            )
+        )
 
     return "\n".join(
         lines
@@ -617,6 +687,15 @@ def build_diagnostic_graph(
             )
         )
 
+        # ============================================================
+        # Safety Review
+        # ============================================================
+
+        safety_reviews = (
+            review_actions(
+                diagnosis_result.recovery_actions
+            )
+        )        
 
         # ========================================================
         # Runtime Evidence Store
@@ -652,6 +731,16 @@ def build_diagnostic_graph(
             )
         )
 
+        # ============================================================
+        # Safety Review
+        # ============================================================
+
+        safety_reviews = (
+            review_actions(
+                diagnosis_result.recovery_actions
+            )
+        )
+
 
         # ========================================================
         # Human-readable Output
@@ -665,6 +754,9 @@ def build_diagnostic_graph(
 
                 validation=
                     validation_report,
+
+                safety_reviews=
+                    safety_reviews,
             )
         )
 
@@ -676,6 +768,9 @@ def build_diagnostic_graph(
 
             "evidence_validation":
                 validation_report,
+
+            "safety_reviews":
+                safety_reviews,
 
             "messages": [
 

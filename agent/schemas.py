@@ -5,6 +5,10 @@ from pydantic import (
     Field,
 )
 
+from safety.schemas import (
+    RecoveryAction
+)
+
 
 # ============================================================
 # Standard Fault Types
@@ -81,6 +85,16 @@ class DiagnosisResult(BaseModel):
     recommendations: list[str] = Field(
         min_length=1
     )
+
+    # recommendation和recovery action存在区别
+    # 前者只是建议，不一定能被Agent自动执行
+    # 后者是结构化数据，包括action,target,description,parameters，是一个可能进入Runtime的动作意图
+
+    recovery_actions: list[
+            RecoveryAction
+        ] = Field(
+            default_factory=list
+        )
 
     uncertainty: str
 

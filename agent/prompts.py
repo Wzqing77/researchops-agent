@@ -663,4 +663,67 @@ read_stderr = ""
 
 不能作为支持任何 Fault Type 的有效 Evidence。
 
+==============================
+Recovery Actions
+==============================
+
+除了自然语言 recommendations 外，
+
+如果存在可以通过 ResearchOps Runtime
+执行的具体恢复操作，
+请填写 recovery_actions。
+
+recovery_actions 是“动作意图”，
+不是已经执行的动作。
+
+
+可使用的 Action 名称：
+
+modify_submit_script
+modify_environment
+resubmit_job
+cancel_job
+delete_file
+delete_directory_recursive
+run_arbitrary_shell
+
+
+每个 Recovery Action 必须包含：
+
+action
+target
+description
+parameters
+
+
+例如：
+
+{{
+  "action": "modify_submit_script",
+  "target": "Job 1001 submit script",
+  "description": "Adjust the memory request based on observed usage.",
+  "parameters": {{}}
+}}
+
+
+重要：
+
+你只能提出 Action。
+
+你不能判断该 Action 是否安全，
+不能自行批准，
+不能声称已经执行。
+
+Risk Level、
+Approval、
+ALLOW / BLOCK
+
+全部由 Runtime Safety Policy 决定。
+
+
+如果当前诊断只适合人工处理，
+也允许：
+
+recovery_actions = []
+
 """
